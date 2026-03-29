@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loadmark — GPS Load Monitoring for Sports Scientists</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0f0f0f;
+    --surface:   #1a1a1a;
+    --border:    #2a2a2a;
+    --border-hi: #3a3a3a;
+    --text:      #f0f0f0;
+    --muted:     #888;
+    --faint:     #444;
+    --teal:      #14b8a6;
+    --teal-dim:  #0d7a72;
+    --teal-glow: rgba(20,184,166,0.08);
+    --amber:     #f59e0b;
+    --green:     #4ade80;
+    --red:       #f87171;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Layout ───────────────────────────── */
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+  .container--wide { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── Nav ──────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    border-bottom: 1px solid var(--border);
+    background: rgba(15,15,15,0.92);
+    backdrop-filter: blur(8px);
+  }
+  .nav-inner {
+    max-width: 960px; margin: 0 auto; padding: 0 24px;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 22px; letter-spacing: 0.04em;
+    color: var(--text); text-decoration: none;
+  }
+  .nav-logo span { color: var(--teal); }
+  .nav-cta {
+    background: var(--teal); color: #0a1a18;
+    border: none; border-radius: 6px;
+    padding: 8px 18px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    text-decoration: none; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .nav-cta:hover { background: #0fa899; }
+
+  /* ── Hero ─────────────────────────────── */
+  .hero {
+    padding: 140px 0 100px;
+    border-bottom: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(20,184,166,0.06) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--teal-glow);
+    border: 1px solid var(--teal-dim);
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 28px;
+  }
+  .hero-label::before {
+    content: '';
+    display: inline-block; width: 6px; height: 6px;
+    border-radius: 50%; background: var(--teal);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: clamp(44px, 7vw, 72px);
+    line-height: 1.0; letter-spacing: -0.01em;
+    color: var(--text);
+    margin-bottom: 24px;
+  }
+  h1 em { font-style: normal; color: var(--teal); }
+  .hero-sub {
+    font-size: 18px; font-weight: 300; color: var(--muted);
+    max-width: 520px; line-height: 1.6;
+    margin-bottom: 44px;
+  }
+  .hero-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-block;
+    background: var(--teal); color: #071412;
+    border-radius: 6px; padding: 14px 28px;
+    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+    text-decoration: none; cursor: pointer; border: none;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-primary:hover { background: #0fa899; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .hero-note { font-size: 13px; color: var(--faint); }
+  .hero-note strong { color: var(--muted); font-weight: 400; }
+
+  /* ── Providers ────────────────────────── */
+  .providers {
+    padding: 40px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .providers-label {
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 20px;
+  }
+  .providers-list {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .provider-badge {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 7px 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px; font-weight: 600; letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+  .provider-badge--active { color: var(--text); border-color: var(--border-hi); }
+
+  /* ── Section headings ─────────────────── */
+  .section { padding: 88px 0; border-bottom: 1px solid var(--border); }
+  .section:last-of-type { border-bottom: none; }
+  .section-eyebrow {
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--teal); font-weight: 500;
+    margin-bottom: 16px;
+  }
+  h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: clamp(30px, 4vw, 44px);
+    line-height: 1.05; color: var(--text);
+    margin-bottom: 16px;
+  }
+  .section-lead {
+    font-size: 17px; font-weight: 300; color: var(--muted);
+    max-width: 560px; line-height: 1.65;
+  }
+
+  /* ── Pain section ─────────────────────── */
+  .pain-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden;
+    margin-top: 48px;
+  }
+  .pain-card {
+    background: var(--surface);
+    padding: 28px 24px;
+  }
+  .pain-icon {
+    font-size: 20px; margin-bottom: 14px;
+    opacity: 0.7;
+  }
+  .pain-card h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px; font-weight: 600; letter-spacing: 0.02em;
+    color: var(--text); margin-bottom: 8px;
+  }
+  .pain-card p { font-size: 14px; color: var(--muted); line-height: 1.55; }
+
+  /* ── How it works ─────────────────────── */
+  .steps { margin-top: 56px; display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: grid; grid-template-columns: 72px 1fr;
+    gap: 0 24px; padding: 32px 0;
+    border-top: 1px solid var(--border);
+  }
+  .step:last-child { border-bottom: 1px solid var(--border); }
+  .step-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 48px; font-weight: 700;
+    color: var(--border-hi); line-height: 1;
+    padding-top: 2px;
+    user-select: none;
+  }
+  .step-body h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px; font-weight: 600; color: var(--text);
+    margin-bottom: 8px; letter-spacing: 0.01em;
+  }
+  .step-body p { font-size: 15px; color: var(--muted); line-height: 1.6; max-width: 540px; }
+  .step-body .tag {
+    display: inline-block; margin-top: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 3px; padding: 3px 10px;
+    font-size: 12px; color: var(--faint); font-family: monospace;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Beta offer ───────────────────────── */
+  .beta-box {
+    margin-top: 56px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .beta-header {
+    background: var(--teal-glow);
+    border-bottom: 1px solid var(--teal-dim);
+    padding: 20px 28px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .beta-header-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 40px; font-weight: 700; color: var(--teal);
+    line-height: 1;
+  }
+  .beta-header-text { }
+  .beta-header-text strong {
+    display: block; font-size: 16px; font-weight: 500; color: var(--text);
+    margin-bottom: 2px;
+  }
+  .beta-header-text span { font-size: 13px; color: var(--muted); }
+  .beta-body { padding: 24px 28px; }
+  .beta-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .beta-list li {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 15px; color: var(--muted);
+  }
+  .beta-list li::before {
+    content: '→';
+    color: var(--teal); font-size: 14px;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .beta-list li strong { color: var(--text); font-weight: 400; }
+  .beta-cta {
+    padding: 24px 28px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  }
+  .beta-cta .btn-primary { flex-shrink: 0; }
+  .beta-cta-note { font-size: 13px; color: var(--faint); line-height: 1.5; }
+
+  /* ── Metrics preview ──────────────────── */
+  .metrics-grid {
+    margin-top: 56px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  }
+  .metric-cell {
+    background: var(--surface); padding: 20px;
+  }
+  .metric-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin-bottom: 10px; }
+  .metric-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 36px; font-weight: 700; line-height: 1;
+    margin-bottom: 6px;
+  }
+  .metric-value--green { color: var(--green); }
+  .metric-value--amber { color: var(--amber); }
+  .metric-value--teal  { color: var(--teal); }
+  .metric-sub { font-size: 12px; color: var(--faint); }
+  .status-dot {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; margin-right: 5px;
+    vertical-align: middle;
+  }
+  .status-dot--green  { background: var(--green); }
+  .status-dot--amber  { background: var(--amber); }
+  .status-dot--teal   { background: var(--teal); }
+
+  /* ── Authority section ───────────────── */
+  .authority-card {
+    margin-top: 56px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  }
+  @media (max-width: 680px) { .authority-card { grid-template-columns: 1fr; } }
+  .authority-left {
+    background: var(--surface); padding: 32px 28px;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .authority-right {
+    background: #111; padding: 32px 28px;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
+  }
+  .authority-quote {
+    font-size: 16px; font-weight: 300; color: var(--muted);
+    line-height: 1.65; font-style: italic;
+    border-left: 2px solid var(--teal-dim); padding-left: 16px;
+  }
+  .authority-quote strong { color: var(--text); font-style: normal; font-weight: 400; }
+  .authority-bio { display: flex; flex-direction: column; gap: 4px; }
+  .authority-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: 0.02em;
+  }
+  .authority-role { font-size: 13px; color: var(--faint); }
+  .authority-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--teal); text-decoration: none;
+    border: 1px solid var(--teal-dim); border-radius: 4px;
+    padding: 7px 14px; align-self: flex-start;
+    transition: background 0.15s;
+  }
+  .authority-link:hover { background: var(--teal-glow); }
+  .authority-timeline { display: flex; flex-direction: column; gap: 16px; }
+  .authority-step { display: flex; gap: 14px; align-items: flex-start; }
+  .authority-step-year {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 600; color: var(--teal);
+    letter-spacing: 0.06em; min-width: 36px; padding-top: 1px;
+  }
+  .authority-step-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .authority-step-text strong { color: var(--text); font-weight: 400; }
+
+  /* ── Other providers section ─────────── */
+  .other-providers-grid {
+    margin-top: 48px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+  }
+  .other-provider-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px; padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .other-provider-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 17px; font-weight: 600; letter-spacing: 0.04em; color: var(--text);
+  }
+  .other-provider-note { font-size: 12px; color: var(--faint); }
+  .other-cta-box {
+    margin-top: 28px;
+    background: var(--teal-glow);
+    border: 1px solid var(--teal-dim);
+    border-radius: 6px; padding: 24px 28px;
+    display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap;
+  }
+  .other-cta-box-text { flex: 1; min-width: 240px; }
+  .other-cta-box-text p { font-size: 15px; color: var(--muted); line-height: 1.6; }
+  .other-cta-box-text p strong { color: var(--text); font-weight: 400; }
+
+  /* ── Footer ───────────────────────────── */
+  footer {
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+  }
+  .footer-inner {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  .footer-logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 18px; letter-spacing: 0.04em;
+    color: var(--muted); text-decoration: none;
+  }
+  .footer-logo span { color: var(--teal); }
+  .footer-note { font-size: 13px; color: var(--faint); }
+
+  /* ── Responsive ───────────────────────── */
+  @media (max-width: 600px) {
+    .hero { padding: 110px 0 72px; }
+    .step { grid-template-columns: 48px 1fr; }
+    .step-num { font-size: 36px; }
+    .beta-header { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .footer-inner { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* ── Scroll-fade animation ────────────── */
+  .fade-up {
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Load<span>mark</span></a>
+    <a href="#beta" class="nav-cta">Apply for beta</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-label">Limited beta — 15 free annual licences</div>
+    <h1>GPS load monitoring<br>built for <em>practitioners,</em><br>not spreadsheets.</h1>
+    <p class="hero-sub">
+      Import Catapult, STATSports, or PlayerTek data, score sessions against your own match demands, and track training stress balance — without a single formula.
+    </p>
+    <div class="hero-actions">
+      <a href="#beta" class="btn-primary">Apply for free access →</a>
+    </div>
+    <p class="hero-note" style="margin-top:20px">
+      <strong>Beta programme.</strong> No credit card. We'll reach out with access details.
+    </p>
+  </div>
+</section>
+
+<!-- PROVIDERS -->
+<div class="providers">
+  <div class="container">
+    <p class="providers-label">Supported GPS providers</p>
+    <div class="providers-list">
+      <span class="provider-badge provider-badge--active">Catapult</span>
+      <span class="provider-badge provider-badge--active">STATSports</span>
+      <span class="provider-badge provider-badge--active">PlayerTek</span>
+      <span class="provider-badge" style="opacity:0.4">More coming</span>
+    </div>
+  </div>
+</div>
+
+<!-- PAIN -->
+<section class="section">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-eyebrow">The problem</p>
+      <h2>Your load data is good.<br>Your workflow isn't.</h2>
+      <p class="section-lead">
+        Most GPS monitoring happens in spreadsheets — rebuilt every season, broken by format changes, and invisible to anyone who wasn't there when it was made.
+      </p>
+    </div>
+    <div class="pain-grid fade-up" style="transition-delay:0.1s">
+      <div class="pain-card">
+        <div class="pain-icon">⟳</div>
+        <h3>Re-imported manually</h3>
+        <p>Every session is a CSV export, a column remap, a formula drag. Multiply that by 25 players and a full pre-season.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">△</div>
+        <h3>No benchmark context</h3>
+        <p>A 6km session means nothing without knowing what 6km looks like on a match day for that player on that squad.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">○</div>
+        <h3>TSB as an afterthought</h3>
+        <p>Training stress balance is the most actionable output — but it's usually a tab nobody checks because keeping it current takes too long.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUTHORITY -->
+<section class="section">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-eyebrow">Where it comes from</p>
+      <h2>Not a startup idea.<br>A practitioner's solution.</h2>
+      <p class="section-lead">
+        The methodology behind Loadmark was built in the field — at a professional football academy, with real GPS data, and a genuine need to make match-demand benchmarking usable without a data engineering team.
+      </p>
+    </div>
+    <div class="authority-card fade-up" style="transition-delay:0.1s">
+      <div class="authority-left">
+        <blockquote class="authority-quote">
+          "The main obstacle I had to overcome was providing a <strong>simple yet effective feedback</strong> to coaching staff. At the end of the day, coaches only want an answer to a very simple question: how hard did we work today?"
+        </blockquote>
+        <div class="authority-bio">
+          <p class="authority-name">Simone Lacava</p>
+          <p class="authority-role">MSc Exercise Physiology, Loughborough — former Head of Academy Sports Science, Southend United FC</p>
+        </div>
+        <a href="https://complementarytraining.com/monitoring-system-in-excel/" target="_blank" class="authority-link">
+          Read the original article →
+        </a>
+      </div>
+      <div class="authority-right">
+        <div class="authority-timeline">
+          <div class="authority-step">
+            <span class="authority-step-year">2019</span>
+            <p class="authority-step-text">Published the <strong>Monitoring System in Excel</strong> on Complementary Training — the volume/intensity scoring framework, benchmarked against individual game averages, used by practitioners worldwide.</p>
+          </div>
+          <div class="authority-step">
+            <span class="authority-step-year">→</span>
+            <p class="authority-step-text">The same methodology — <strong>volume score, intensity score, EWMA training stress balance</strong> — is now the engine inside Loadmark. No spreadsheet required.</p>
+          </div>
+          <div class="authority-step">
+            <span class="authority-step-year">Now</span>
+            <p class="authority-step-text">Loadmark is the answer to the question practitioners kept asking: <strong>can I get this without maintaining a spreadsheet every season?</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-eyebrow">How it works</p>
+      <h2>Three things,<br>done properly.</h2>
+    </div>
+    <div class="steps fade-up" style="transition-delay:0.1s">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <h3>Import your CSV — any provider</h3>
+          <p>Drop in a Catapult OpenField, STATSports CoachMePlus/Sonra, or PlayerTek export. Loadmark handles the format differences, date quirks, and column aliases automatically. No remapping required.</p>
+          <span class="tag">catapult · statsports · playertek</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <h3>Sessions scored against your match data</h3>
+          <p>Volume and intensity scores are computed automatically using your team's own game data as the reference — benchmarked to 65-minute match eligibility thresholds, not arbitrary defaults. HSD recalculates if you change speed thresholds, retroactively.</p>
+          <span class="tag">volume score · intensity score · load AU</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <h3>Training stress balance, always current</h3>
+          <p>Acute and chronic EWMA for all six volume metrics, per player, updated on every import. Colour-coded status flags — optimal, caution, high-risk — built from your full session history, not just the last 28 days.</p>
+          <span class="tag">acute · chronic · TSB ratio</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS PREVIEW -->
+<section class="section">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-eyebrow">What you see</p>
+      <h2>Every metric in one view.</h2>
+      <p class="section-lead">
+        Daily dashboard with session scoring, TSB status per player per metric, and EWMA trend charts — no config needed after your first import.
+      </p>
+    </div>
+    <div class="metrics-grid fade-up" style="transition-delay:0.1s">
+      <div class="metric-cell">
+        <p class="metric-label">Volume score</p>
+        <p class="metric-value metric-value--green">6.9</p>
+        <p class="metric-sub"><span class="status-dot status-dot--green"></span>Based on 8 games</p>
+      </div>
+      <div class="metric-cell">
+        <p class="metric-label">Intensity score</p>
+        <p class="metric-value metric-value--amber">5.5</p>
+        <p class="metric-sub"><span class="status-dot status-dot--amber"></span>Moderate</p>
+      </div>
+      <div class="metric-cell">
+        <p class="metric-label">TSB ratio</p>
+        <p class="metric-value metric-value--teal">1.12</p>
+        <p class="metric-sub"><span class="status-dot status-dot--teal"></span>Optimal</p>
+      </div>
+      <div class="metric-cell">
+        <p class="metric-label">Load AU</p>
+        <p class="metric-value" style="color:var(--text)">612</p>
+        <p class="metric-sub">RPE 7 × 87 min</p>
+      </div>
+      <div class="metric-cell">
+        <p class="metric-label">Total distance</p>
+        <p class="metric-value" style="color:var(--text); font-size:28px">6,340<span style="font-size:16px; font-weight:400; color:var(--faint)"> m</span></p>
+        <p class="metric-sub">78% of match avg</p>
+      </div>
+      <div class="metric-cell">
+        <p class="metric-label">HSD</p>
+        <p class="metric-value" style="color:var(--text); font-size:28px">810<span style="font-size:16px; font-weight:400; color:var(--faint)"> m</span></p>
+        <p class="metric-sub">65% of match avg</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BETA -->
+<section class="section" id="beta">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-eyebrow">Beta programme</p>
+      <h2>Free access.<br>Honest feedback.</h2>
+      <p class="section-lead">
+        We're giving away 15 annual licences to practitioners willing to use Loadmark with real squad data and tell us what's broken, missing, or wrong.
+      </p>
+    </div>
+    <div class="beta-box fade-up" style="transition-delay:0.1s">
+      <div class="beta-header">
+        <div class="beta-header-num">15</div>
+        <div class="beta-header-text">
+          <strong>Free annual licences available</strong>
+          <span>Applications close when they're gone — we're keeping the beta small on purpose</span>
+        </div>
+      </div>
+      <div class="beta-body">
+        <ul class="beta-list">
+          <li><div>Full app access — <strong>import sessions, track TSB, view dashboards</strong> — for 12 months at no cost</div></li>
+          <li><div>We'll ask for occasional feedback calls (30 min, optional) and bug reports via a shared Slack channel</div></li>
+          <li><div>Your data stays yours — we don't use squad GPS data for anything beyond running the app</div></li>
+          <li><div>If you're using <strong>Catapult, STATSports, or PlayerTek</strong> with a squad of any size, you're eligible</div></li>
+        </ul>
+      </div>
+      <div class="beta-cta">
+        <!-- Replace YOUR_TALLY_FORM_URL with your Tally form link -->
+        <a href="YOUR_TALLY_FORM_URL" target="_blank" class="btn-primary">Apply for free access →</a>
+        <p class="beta-cta-note">Takes 2 minutes. Name, email, organisation, GPS provider.<br>No credit card, no commitment, no pitch calls.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OTHER PROVIDERS -->
+<section class="section">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-eyebrow">Don't see your device?</p>
+      <h2>Using a different<br>GPS system?</h2>
+      <p class="section-lead">
+        We're actively expanding provider support. If you're using a system we haven't built yet, we want to hear from you — and potentially work with you directly to add it.
+      </p>
+    </div>
+    <div class="other-providers-grid fade-up" style="transition-delay:0.1s">
+      <div class="other-provider-card">
+        <p class="other-provider-name">WIMU</p>
+        <p class="other-provider-note">RealTrack Systems</p>
+      </div>
+      <div class="other-provider-card">
+        <p class="other-provider-name">K-Sport</p>
+        <p class="other-provider-note">Kinexon / K-Sport</p>
+      </div>
+      <div class="other-provider-card">
+        <p class="other-provider-name">PlayerData</p>
+        <p class="other-provider-note">APEX pods</p>
+      </div>
+      <div class="other-provider-card">
+        <p class="other-provider-name">GPexe</p>
+        <p class="other-provider-note">Exelio</p>
+      </div>
+      <div class="other-provider-card">
+        <p class="other-provider-name">Polar</p>
+        <p class="other-provider-note">Team Pro</p>
+      </div>
+      <div class="other-provider-card" style="border-style: dashed; opacity: 0.5;">
+        <p class="other-provider-name">Yours?</p>
+        <p class="other-provider-note">Let us know</p>
+      </div>
+    </div>
+    <div class="other-cta-box fade-up" style="transition-delay:0.2s">
+      <div class="other-cta-box-text">
+        <p>If you're using one of these — or anything else — <strong>apply for the beta anyway</strong> and tell us what system you're on. We'll prioritise new providers based on who's actually waiting for them. If you're willing to share sample exports and test the integration, we'll bump you to the front of the queue.</p>
+      </div>
+      <!-- Replace YOUR_TALLY_FORM_URL with your Tally link -->
+      <a href="YOUR_TALLY_FORM_URL" target="_blank" class="btn-primary" style="flex-shrink:0; align-self:center">Register interest →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="#" class="footer-logo">Load<span>mark</span></a>
+      <p class="footer-note">Built for sports scientists, by a sports scientist.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
