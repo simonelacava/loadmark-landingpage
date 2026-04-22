@@ -410,7 +410,7 @@
 <nav>
   <div class="nav-inner">
     <a href="#" class="nav-logo">Load<span>mark</span></a>
-    <a href="#beta" class="nav-cta">Founder Access</a>
+    <a href="#" class="nav-cta founder-modal-trigger">Founder Access</a>
   </div>
 </nav>
 
@@ -625,9 +625,8 @@
         </ul>
       </div>
       <div class="beta-cta">
-        <!-- Replace YOUR_TALLY_FORM_URL with your Tally form link -->
-        <a href="YOUR_TALLY_FORM_URL" target="_blank" class="btn-primary">Apply for free access →</a>
-        <p class="beta-cta-note">Takes 2 minutes. Name, email, organisation, GPS provider.<br>No credit card, no commitment, no pitch calls.</p>
+        <a href="#" class="btn-primary founder-modal-trigger">Apply for free access →</a>
+        <p class="beta-cta-note">Takes 2 minutes. Name, email, GPS provider.<br>No credit card, no commitment, no pitch calls.</p>
       </div>
     </div>
   </div>
@@ -673,8 +672,7 @@
       <div class="other-cta-box-text">
         <p>If you're using one of these — or anything else — <strong>apply for Founder Access anyway</strong> and tell us what system you're on. We'll prioritise new providers based on who's actually waiting for them. If you're willing to share sample exports and test the integration, we'll bump you to the front of the queue.</p>
       </div>
-      <!-- Replace YOUR_TALLY_FORM_URL with your Tally link -->
-      <a href="YOUR_TALLY_FORM_URL" target="_blank" class="btn-primary" style="flex-shrink:0; align-self:center">Register interest →</a>
+      <a href="#" class="btn-primary founder-modal-trigger" style="flex-shrink:0; align-self:center">Register interest →</a>
     </div>
   </div>
 </section>
@@ -694,6 +692,118 @@
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.1 });
   document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+
+<!-- FOUNDER ACCESS MODAL -->
+<div id="founder-modal" style="display:none;position:fixed;inset:0;z-index:1000;align-items:center;justify-content:center;padding:1rem" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div id="modal-backdrop" style="position:absolute;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px)"></div>
+  <div style="position:relative;width:100%;max-width:420px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:#1a1a1a;padding:2rem;box-shadow:0 25px 50px rgba(0,0,0,0.5)">
+    <button id="modal-close" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;padding:4px" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+    <div style="margin-bottom:1.5rem">
+      <span style="font-size:0.7rem;font-weight:700;padding:0.2rem 0.65rem;border-radius:999px;background:#14b8a6;color:#0f0f0f;letter-spacing:0.05em;text-transform:uppercase">Founder Access</span>
+      <h2 id="modal-title" style="margin:0.75rem 0 0.4rem;font-size:1.2rem;font-weight:700;color:#fff">Apply for Founder Access</h2>
+      <p style="margin:0;font-size:0.85rem;color:rgba(255,255,255,0.45);line-height:1.5">2 months free, then £9.50/mo for your first year. We'll be in touch with next steps.</p>
+    </div>
+    <form id="founder-form" novalidate>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+        <div>
+          <label style="display:block;font-size:0.75rem;font-weight:500;color:rgba(255,255,255,0.6);margin-bottom:0.4rem" for="founder-first-name">First name</label>
+          <input id="founder-first-name" type="text" autocomplete="given-name" placeholder="Jane" style="width:100%;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);padding:0.5rem 0.75rem;font-size:0.85rem;color:#fff;outline:none" />
+        </div>
+        <div>
+          <label style="display:block;font-size:0.75rem;font-weight:500;color:rgba(255,255,255,0.6);margin-bottom:0.4rem" for="founder-last-name">Last name</label>
+          <input id="founder-last-name" type="text" autocomplete="family-name" placeholder="Smith" style="width:100%;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);padding:0.5rem 0.75rem;font-size:0.85rem;color:#fff;outline:none" />
+        </div>
+      </div>
+      <div style="margin-bottom:1.25rem">
+        <label style="display:block;font-size:0.75rem;font-weight:500;color:rgba(255,255,255,0.6);margin-bottom:0.4rem" for="founder-email">Email address</label>
+        <input id="founder-email" type="email" autocomplete="email" placeholder="jane@yourclub.com" style="width:100%;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);padding:0.5rem 0.75rem;font-size:0.85rem;color:#fff;outline:none" />
+      </div>
+      <p id="founder-error" style="display:none;font-size:0.82rem;color:#f87171;margin-bottom:0.75rem"></p>
+      <button id="founder-submit" type="submit" style="width:100%;padding:0.65rem;border-radius:8px;border:none;background:#14b8a6;color:#0f0f0f;font-size:0.875rem;font-weight:600;cursor:pointer">Apply for Founder Access</button>
+    </form>
+    <div id="founder-success" style="display:none;text-align:center;padding:1rem 0">
+      <div style="width:48px;height:48px;border-radius:50%;background:rgba(20,184,166,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 11l5 5 9-9" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3 style="margin:0 0 0.5rem;font-size:1rem;font-weight:600;color:#fff">You're on the list.</h3>
+      <p style="margin:0;font-size:0.85rem;color:rgba(255,255,255,0.5)">We'll be in touch with next steps. Welcome aboard.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var API_URL = 'https://app.loadmark.app/api/founder-access';
+    var modal     = document.getElementById('founder-modal');
+    var backdrop  = document.getElementById('modal-backdrop');
+    var closeBtn  = document.getElementById('modal-close');
+    var form      = document.getElementById('founder-form');
+    var success   = document.getElementById('founder-success');
+    var errorEl   = document.getElementById('founder-error');
+    var submitBtn = document.getElementById('founder-submit');
+
+    function openModal() {
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      document.getElementById('founder-first-name').focus();
+    }
+    function closeModal() {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.founder-modal-trigger').forEach(function (el) {
+      el.addEventListener('click', function (e) { e.preventDefault(); openModal(); });
+    });
+
+    backdrop.addEventListener('click', closeModal);
+    closeBtn.addEventListener('click', closeModal);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      errorEl.style.display = 'none';
+
+      var firstName = document.getElementById('founder-first-name').value.trim();
+      var lastName  = document.getElementById('founder-last-name').value.trim();
+      var email     = document.getElementById('founder-email').value.trim();
+
+      if (!firstName || !lastName || !email) {
+        errorEl.textContent = 'Please fill in all fields.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting…';
+
+      try {
+        var res  = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ firstName: firstName, lastName: lastName, email: email }),
+        });
+        var data = await res.json();
+        if (res.ok) {
+          form.style.display = 'none';
+          success.style.display = 'block';
+        } else {
+          errorEl.textContent = data.error || 'Something went wrong. Please try again.';
+          errorEl.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Apply for Founder Access';
+        }
+      } catch (_) {
+        errorEl.textContent = 'Network error. Please check your connection and try again.';
+        errorEl.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Apply for Founder Access';
+      }
+    });
+  })();
 </script>
 </body>
 </html>
